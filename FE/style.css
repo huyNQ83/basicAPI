@@ -1,3 +1,7 @@
 .create-user-btn{
   cursor: pointer;
 }
+.formSearch{
+  display: flex;
+  flex-direction: row;
+}

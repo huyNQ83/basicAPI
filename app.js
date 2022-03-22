@@ -34,7 +34,7 @@ app.use('/admin',isLoggedIn, adminRouter);
 app.use('/api', apiUsersRouter);
 
 // Connect to MongoDB
-const url = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.fevpl.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
+const url = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.gfpeb.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
 mongoose.connect(
   url,
   { useNewUrlParser: true, useUnifiedTopology: true },

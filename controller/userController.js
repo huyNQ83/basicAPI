@@ -76,11 +76,21 @@ const deleteUser = async (req, res) => {
   }
 }
 
+const searchUser = async (req, res) => {
+  try {
+    const {query} = req.query;
+    
+  } catch (error) {
+    
+  }
+}
+
 module.exports = {
   findAllUsers,
   findUserById,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  searchUser
 }
 
