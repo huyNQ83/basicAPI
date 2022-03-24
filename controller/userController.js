@@ -11,7 +11,7 @@ const findAllUsers = async (req, res, next) => {
   } catch (error) {
     return res.status(500).send(error);
   }
-}
+};
 
 const findUserById = async (req, res, next) => {
   try {
@@ -27,7 +27,7 @@ const findUserById = async (req, res, next) => {
   } catch (error) {
     return res.status(500).send(error);
   }
-}
+};
 
 const createUser = async (req, res) => {
   try {
@@ -42,7 +42,7 @@ const createUser = async (req, res) => {
     console.log("🚀 ~ file: userController.js ~ line 42 ~ createUser ~ error", error);
     return res.status(500).send('Internal server error');
   }
-}
+};
 
 const updateUser = async ( req, res ) => {
   try {
@@ -58,7 +58,7 @@ const updateUser = async ( req, res ) => {
   } catch (error) {
     return res.status(500).send(error);
   }
-}
+};
 
 const deleteUser = async (req, res) => {
   try {
@@ -74,16 +74,19 @@ const deleteUser = async (req, res) => {
   } catch (error) {
     return res.status(500).send(error);
   }
-}
+};
 
 const searchUser = async (req, res) => {
-  try {
-    const {query} = req.query;
-    
-  } catch (error) {
-    
-  }
-}
+  const {query} = req.query;
+  const condition = {
+    $or: [
+      { name: { $regex: String(query), $options: "i" } },
+      { email: { $regex: String(query), $options: "i" } },
+    ],
+  };
+  const findUser = await UserModel.find(condition);
+  res.send(findUser);
+};
 
 module.exports = {
   findAllUsers,

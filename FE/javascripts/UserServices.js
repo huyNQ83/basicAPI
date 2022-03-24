@@ -67,3 +67,17 @@ const getUsers = async () => {
       return [];
     }
   }
+
+  const searchUser = async (query) => {
+    try {
+      const URI = `http://localhost:3000/api/search?query=${query}`;
+
+      const response = await axios.get(URI);
+
+      return response.data;
+
+    } catch (error) {
+      console.log("🚀 ~ file: UserServices.js ~ line 80 ~ searchUser ~ error", error)
+      return [];
+    }
+  }
