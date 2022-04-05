@@ -236,14 +236,25 @@
         renderUserRow(newUser);
       }
 
-      const handleSearchUser = async (event) => {
-      console.log("🚀 ~ file: index.html ~ line 240 ~ handleSearchUser ~ event", event)
+        const handleSearchUser = async () => {
 
-      const query = document.querySelector(".form-input-search").value
-      console.log("🚀 ~ file: index.html ~ line 244 ~ query", query)
+        const query = document.querySelector(".form-input-search").value
+        console.log("🚀 ~ file: index.html ~ line 244 ~ query", query)
 
-      const SearchUserButton = await searchUser(query);
+        // Call API
+        const SearchUserButton = await searchUser(query);
+        console.log("🚀 ~ file: index.html ~ line 247 ~ handleSearchUser ~ SearchUserButton", SearchUserButton)
+
+        // Render old user value
+        const tableBody = document.querySelector('#tableBody');
+        tableBody.innerHTML = '';
+
+        // Render new user value
+        renderUsersTable(SearchUserButton);
       }
+
+      
+
 
       document.addEventListener("DOMContentLoaded", async (event) => {
         const users = await getUsers();
