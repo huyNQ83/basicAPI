@@ -34,9 +34,17 @@
               </thead>
               <tbody id="tableBody">
                
-                
               </tbody>
           </table>
+
+          <!-- Start Pagination -->
+          <nav aria-label="...">
+            <ul class="pagination pagination-lg">
+              
+            </ul>
+          </nav>
+          <!-- End Pagination -->
+
         </div>
       </div>
     </div>
@@ -123,7 +131,106 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="javascripts/UserServices.js"></script>
 
-    <script>
+    <script> 
+
+      const renderUpdateUser = async (element) => {
+        console.log("🚀 ~ file: index.html ~ line 196 ~ renderUpdateUser ~ element", element)
+        const userId = element.dataset.userid;
+        console.log("🚀 ~ file: index.html ~ line 198 ~ renderUpdateUser ~ userId", userId)
+        const user = await getUser(userId);
+        console.log("🚀 ~ file: index.html ~ line 200 ~ renderUpdateUser ~ user", user)
+
+        document.querySelector('#currentUserName').value = user.name;
+        document.querySelector('#currentUserEmail').value = user.email;
+        document.querySelector('#currentUserPassword').value = user.password;
+
+        document.querySelector('#update-user-btn').dataset.userid = userId;
+      }
+      
+      const renderUserRow = (user) => {
+        let html = `<tr data-userid=${user._id}>
+                        <td>${user.email}</td>
+                        <td>${user.name}</td>
+                        <td>${user.password}</td>
+                        <td><button class="btn btn-danger deleteUserBtn" data-userId=${user._id} onClick="handleDeleteUser(this)">Delete</button></td>
+                        <td><button class="btn btn-warning deleteUserBtn" data-userId=${user._id} onClick="renderUpdateUser(this)" data-toggle="modal" data-target="#updateUserModal">Update</button></td>
+                      </tr>`;
+        tableBody.insertAdjacentHTML('beforeend', html);
+      }
+
+      const renderUsersTable = (users) => {
+        const tableBody = document.querySelector('#tableBody');
+        tableBody.innerHTML = '';
+
+        users.forEach(user => {
+          renderUserRow(user);
+        })
+      }
+
+      const renderPage = async (page, limit = 3) => {
+        const { totalPages, page: currentPage, docs: users } = await getUsers(page, limit);
+        renderUsersTable(users);
+        renderPagination(totalPages, currentPage);
+      }
+
+      const renderPagination = async (totalPages, currentPage) => {
+        const paginationSection = document.querySelector('ul.pagination');
+        paginationSection.innerHTML = '';
+
+        for(let i = 1; i <= totalPages; i++) {
+          if(currentPage === i ) {
+            const activePage = `<li class="page-item active" aria-current="page">
+                                  <span class="page-link">${i}</span>
+                                </li>`;
+            paginationSection.insertAdjacentHTML('beforeend', activePage);
+          }else{
+            const unactivePage = `<li class="page-item"><a class="page-link" onClick="renderPage(${i})">${i}</a></li>`
+            paginationSection.insertAdjacentHTML('beforeend', unactivePage); 
+          }
+        }
+
+      }
+
+      const handleCreateUser = async (event) => {
+        // Get user's input from create user modal
+        const name = document.querySelector('#newUserName').value;          
+        const email = document.querySelector('#newUserEmail').value;          
+        const password = document.querySelector('#newUserPassword').value;          
+
+        // Setup payload for create new user
+        const payload = {
+          name,
+          email,
+          password
+        }
+
+        // Create new user by calling api
+        const newUser = await createUser(payload);
+
+        // Close create modal after finsish
+        const closeModalBtn = document.querySelector('#close-create-modal');
+        closeModalBtn.click();
+
+        // Render new user's data into table of users
+        renderPage(1); 
+      }
+
+        const handleSearchUser = async () => {
+
+        const query = document.querySelector(".form-input-search").value
+        console.log("🚀 ~ file: index.html ~ line 244 ~ query", query)
+
+        // Call API
+        const SearchUserButton = await searchUser(query);
+        console.log("🚀 ~ file: index.html ~ line 247 ~ handleSearchUser ~ SearchUserButton", SearchUserButton)
+
+        // Render old user value
+        const tableBody = document.querySelector('#tableBody');
+        tableBody.innerHTML = '';
+
+        // Render new user value
+        renderUsersTable(SearchUserButton);
+      }
 
       const handleDeleteUser = async (element) => {
         const userId = element.dataset.userid;
@@ -136,11 +243,8 @@
         const users = await getUsers();
 
         // Remove old users value
-        const tableBody = document.querySelector('#tableBody');
-        tableBody.innerHTML = '';
-
-        // Render new users value
-        renderUsersTable(users);
+        const removedUser = document.querySelector(`tr[data-userid='${userId}'`)
+        removedUser.remove();
       }
 
       const handleUpdateUser = async () => {
@@ -176,89 +280,13 @@
         }
         renderUserRow(newUser)
         
-      } 
-
-      const renderUpdateUser = async (element) => {
-        console.log("🚀 ~ file: index.html ~ line 196 ~ renderUpdateUser ~ element", element)
-        const userId = element.dataset.userid;
-        console.log("🚀 ~ file: index.html ~ line 198 ~ renderUpdateUser ~ userId", userId)
-        const user = await getUser(userId);
-        console.log("🚀 ~ file: index.html ~ line 200 ~ renderUpdateUser ~ user", user)
-
-        document.querySelector('#currentUserName').value = user.name;
-        document.querySelector('#currentUserEmail').value = user.email;
-        document.querySelector('#currentUserPassword').value = user.password;
-
-        document.querySelector('#update-user-btn').dataset.userid = userId;
-      }
-      
-      const renderUserRow = (user) => {
-        let html = `<tr data-userid=${user._id}>
-                        <td>${user.email}</td>
-                        <td>${user.name}</td>
-                        <td>${user.password}</td>
-                        <td><button class="btn btn-danger deleteUserBtn" data-userId=${user._id} onClick="handleDeleteUser(this)">Delete</button></td>
-                        <td><button class="btn btn-warning deleteUserBtn" data-userId=${user._id} onClick="renderUpdateUser(this)" data-toggle="modal" data-target="#updateUserModal">Update</button></td>
-                      </tr>`;
-        tableBody.insertAdjacentHTML('beforeend', html);
       }
 
-      const renderUsersTable = (users) => {
-        const tableBody = document.querySelector('#tableBody');
-        
-        users.forEach(user => {
-          renderUserRow(user);
-        })
-      }
-
-      const handleCreateUser = async (event) => {
-        // Get user's input from create user modal
-        const name = document.querySelector('#newUserName').value;          
-        const email = document.querySelector('#newUserEmail').value;          
-        const password = document.querySelector('#newUserPassword').value;          
-
-        // Setup payload for create new user
-        const payload = {
-          name,
-          email,
-          password
-        }
-
-        // Create new user by calling api
-        const newUser = await createUser(payload);
-
-        // Close create modal after finsish
-        const closeModalBtn = document.querySelector('#close-create-modal');
-        closeModalBtn.click();
-
-        // Render new user's data into table of users
-        const tableBody = document.querySelector('#tableBody');
-        renderUserRow(newUser);
-      }
-
-        const handleSearchUser = async () => {
-
-        const query = document.querySelector(".form-input-search").value
-        console.log("🚀 ~ file: index.html ~ line 244 ~ query", query)
-
-        // Call API
-        const SearchUserButton = await searchUser(query);
-        console.log("🚀 ~ file: index.html ~ line 247 ~ handleSearchUser ~ SearchUserButton", SearchUserButton)
-
-        // Render old user value
-        const tableBody = document.querySelector('#tableBody');
-        tableBody.innerHTML = '';
-
-        // Render new user value
-        renderUsersTable(SearchUserButton);
-      }
 
       
-
-
       document.addEventListener("DOMContentLoaded", async (event) => {
-        const users = await getUsers();
-        renderUsersTable(users);
+         // Render first page (page = 1 )
+         renderPage(1);
 
         const createUserBtn = document.querySelector('#create-user-btn');
         createUserBtn.addEventListener('click', handleCreateUser);
